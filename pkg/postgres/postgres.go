@@ -2,12 +2,10 @@ package postgres
 
 import (
 	"context"
-	"fmt"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-func OpenDb(host, port, user, password, dbname string) (*pgxpool.Pool, error) {
-	dsn := fmt.Sprintf("postgres://%s:%s@%s:%s/%s", user, password, host, port, dbname)
+func OpenDb(dsn string) (*pgxpool.Pool, error) {
 
 	db, err := pgxpool.New(context.Background(), dsn)
 	if err != nil {

@@ -6,10 +6,11 @@ import (
 	httpDelivery "messanger/services/receiptManage/internal/Delivery/http"
 	"messanger/services/receiptManage/internal/Repository"
 	"messanger/services/receiptManage/internal/Use_Case"
+	"os"
 )
 
 func main() {
-	db, err := postgres.OpenDb("localhost", "5432", "postgres", "123456", "receipts")
+	db, err := postgres.OpenDb(os.Getenv("RECEIPTDB_URI"))
 	if err != nil {
 		log.Fatal(err)
 		return

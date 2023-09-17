@@ -31,9 +31,9 @@ func NewApp(useCase Use_Case.ReceiptUseCase) *App {
 
 func (a *App) Route() *gin.Engine {
 	a.router.POST("/receipts/create", a.createReceipt)
-	a.router.DELETE("/receipts/delete/:id", a.createReceipt)
+	a.router.DELETE("/receipts/delete/:id", a.deleteReceipt)
 	a.router.GET("/receipts/get/:id", a.getReceipt)
 	a.router.GET("/receipts/get", a.getAllReceipt)
-	a.router.PATCH("/receipts/update", a.updateReceipt)
+	a.router.PATCH("/receipts/update/:id", a.updateReceipt)
 	return a.router
 }

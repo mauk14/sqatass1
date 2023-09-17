@@ -72,7 +72,8 @@ func (r *receiptRepository) Update(ctx context.Context, receipt *Domain.Receipt)
 	query := `
 		UPDATE receipts
 		SET title = $1, author = $2, description = $3, upload_at = now()
-		WHERE id = $4`
+		WHERE id = $4
+		RETURNING id`
 
 	args := []interface{}{
 		receipt.Title,
@@ -80,7 +81,7 @@ func (r *receiptRepository) Update(ctx context.Context, receipt *Domain.Receipt)
 		receipt.Description,
 		receipt.Id,
 	}
-	return r.db.QueryRow(ctx, query, args...).Scan()
+	return r.db.QueryRow(ctx, query, args...).Scan(&receipt.Id)
 }
 
 func (r *receiptRepository) GetAll(ctx context.Context) ([]*Domain.Receipt, error) {
@@ -111,6 +112,7 @@ func (r *receiptRepository) GetAll(ctx context.Context) ([]*Domain.Receipt, erro
 		if err != nil {
 			return nil, err
 		}
+		receipts = append(receipts, &receipt)
 	}
 
 	return receipts, nil

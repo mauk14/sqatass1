@@ -3,6 +3,7 @@ package Use_Case
 import (
 	"context"
 	"errors"
+	"github.com/jackc/pgx/v5"
 	validator2 "messanger/pkg/validator"
 	"messanger/services/receiptManage/internal/Domain"
 	"messanger/services/receiptManage/internal/Repository"
@@ -12,7 +13,7 @@ import (
 type ReceiptUseCase interface {
 	Create(context.Context, *Domain.Receipt) error
 	Delete(context.Context, int64) error
-	Update(context.Context, *Domain.Receipt) error
+	Update(context.Context, int64, *Domain.Receipt) error
 	Get(context.Context, int64) (*Domain.Receipt, error)
 	GetAll(context.Context) ([]*Domain.Receipt, error)
 }
@@ -48,12 +49,14 @@ func (r *receiptUseCase) Delete(ctx context.Context, id int64) error {
 
 }
 
-func (r *receiptUseCase) Update(ctx context.Context, receipt *Domain.Receipt) error {
-	if receipt.Id < 1 {
+func (r *receiptUseCase) Update(ctx context.Context, id int64, receipt *Domain.Receipt) error {
+	if id < 1 {
 		return errors.New("Record not found")
 	}
 
-	rec, err := r.Get(ctx, receipt.Id)
+	rec, err := r.Get(ctx, id)
+	//fmt.Println(err)
+
 	if err != nil {
 		return err
 	}
@@ -69,7 +72,7 @@ func (r *receiptUseCase) Update(ctx context.Context, receipt *Domain.Receipt) er
 		rec.Description = receipt.Description
 	}
 
-	return r.repository.Update(ctx, receipt)
+	return r.repository.Update(ctx, rec)
 
 }
 func (r *receiptUseCase) Get(ctx context.Context, id int64) (*Domain.Receipt, error) {
@@ -78,6 +81,9 @@ func (r *receiptUseCase) Get(ctx context.Context, id int64) (*Domain.Receipt, er
 	}
 	receipt, err := r.repository.Get(ctx, id)
 	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, errors.New("Record not found")
+		}
 		return nil, err
 	}
 	return receipt, nil
